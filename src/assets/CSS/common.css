@@ -1,0 +1,25 @@
+:root {
+  --primary-color:#ff9854;
+  --van-search-left-icon-color: var(--primary-color) !important;
+  --line-color:#faf8f9;
+  --theme-linear-gradient:linear-gradient(90deg, #fa8c1d, #fcaf3f);
+}
+
+body {
+  font-size: 14px;
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+
+/* 为了覆盖底部tab栏 */
+.top-page {
+  position:relative;
+  z-index: 9;
+  height: 100vh;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+.bottom-gray-line {
+  border-bottom: 1px solid #faf8f9;
+}

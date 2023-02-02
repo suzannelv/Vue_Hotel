@@ -1,54 +1,64 @@
-import { onMounted, onUnmounted, ref } from "vue"
-import { throttle} from "underscore"
+import { onDeactivated, onMounted, onUnmounted, ref } from 'vue';
+import { throttle } from 'underscore'
 
-// méthode 1:
+// console.log(throttle)
+
+
 // export default function useScroll(reachBottomCB) {
-//   const scrollListenerHandler = () =>{
+//   const scrollListenerHandler = () => {
 //     const clientHeight = document.documentElement.clientHeight
-//     const scrollTop=document.documentElement.scrollTop
-//     const scrollHeight=document.documentElement.scrollHeight
-//     if(clientHeight+scrollTop>=scrollHeight) {
+//     const scrollTop = document.documentElement.scrollTop
+//     const scrollHeight = document.documentElement.scrollHeight
+//     console.log("-------")
+//     if (clientHeight + scrollTop >= scrollHeight) {
+//       console.log("滚动到底部了")
 //       if (reachBottomCB) reachBottomCB()
 //     }
 //   }
   
 //   onMounted(() => {
-//   window.addEventListener("scroll", scrollListenerHandler)
-    
+//     window.addEventListener("scroll", scrollListenerHandler)
 //   })
-//   // 当我们离开页面时，移除监听
+  
 //   onUnmounted(() => {
 //     window.removeEventListener("scroll", scrollListenerHandler)
 //   })
 // }
 
+export default function useScroll(elRef) {
+  let el = window
 
-// méthode 2:
-
-export default function useScroll() {
   const isReachBottom = ref(false)
-  const clientHeight=ref(0)
+
+  const clientHeight = ref(0)
   const scrollTop = ref(0)
   const scrollHeight = ref(0)
-// 防抖/节流 npm install underscore
-  const scrollListenerHandler = throttle(() =>{
-    clientHeight.value = document.documentElement.clientHeight
-    scrollTop.value=document.documentElement.scrollTop
-    scrollHeight.value =document.documentElement.scrollHeight
-    
-    if(clientHeight.value+scrollTop.value>=scrollHeight.value) {
-      isReachBottom.value=true
+
+  // 防抖/节流
+  const scrollListenerHandler = throttle(() => {
+    if (el === window) {
+      clientHeight.value = document.documentElement.clientHeight
+      scrollTop.value = document.documentElement.scrollTop
+      scrollHeight.value = document.documentElement.scrollHeight
+    } else {
+      clientHeight.value = el.clientHeight
+      scrollTop.value = el.scrollTop
+      scrollHeight.value = el.scrollHeight
     }
-  },100)
+    if (clientHeight.value + scrollTop.value >= scrollHeight.value) {
+      console.log("滚动到底部了")
+      isReachBottom.value = true
+    }
+  }, 100)
   
   onMounted(() => {
-  window.addEventListener("scroll", scrollListenerHandler)
-    
+    if (elRef) el = elRef.value
+    el.addEventListener("scroll", scrollListenerHandler)
   })
-  // 当我们离开页面时，移除监听
+  
   onUnmounted(() => {
-    window.removeEventListener("scroll", scrollListenerHandler)
+    el.removeEventListener("scroll", scrollListenerHandler)
   })
 
-  return {isReachBottom, scrollHeight, scrollTop, clientHeight}
+  return { isReachBottom, clientHeight, scrollTop, scrollHeight }
 }

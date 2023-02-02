@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" ref="homeRef">
     <home-nav-bar/>
     <div class="banner">
       <img src="@/assets/images/home/banner.webp" alt="">
@@ -15,9 +15,11 @@
   
   </div>
 </template>
-
+<script>
+export default {name:"home"}
+</script>
 <script setup>
-import { watch, computed } from 'vue';
+import { watch, computed, onActivated } from 'vue';
 import useScroll from '@/hooks/useScroll'
 import useHomeStore from '@/stores/modules/home';
 import { ref } from 'vue';
@@ -48,7 +50,8 @@ homeStore.fetchHouseListData()
 // })
 
 // méthode 2:définir un variable
-const { isReachBottom, scrollTop} = useScroll()
+const homeRef = ref()
+const { isReachBottom, scrollTop} = useScroll(homeRef)
 watch(isReachBottom, (newValue) =>{
   if(newValue){
     homeStore.fetchHouseListData().then(()=>{
@@ -67,6 +70,14 @@ watch(isReachBottom, (newValue) =>{
 // 定义的可响应式数据，依赖另外一个可响应式的数据，那么可以使用计算属性(computed)
 const isShowSearchBar=computed(()=>{
   return scrollTop.value >= 350
+})
+
+
+// 跳转回home时, 保留原来的位置
+onActivated(() => {
+  homeRef.value?.scrollTo({
+    top: scrollTop.value
+  })
 })
 
 // 1.热门建议
@@ -88,6 +99,10 @@ const isShowSearchBar=computed(()=>{
 <style lang="less" scoped>
 
 .home {
+  padding-bottom: 60px;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-y: auto;
 
   img {
     width:100%;
